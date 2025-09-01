@@ -1,0 +1,109 @@
+<%- include('../includes/head', { title: mode === 'edit' ? 'Edit Event' : 'New Event' }) %>
+<%- include('../includes/nav', { activePath: mode === 'edit' ? '/admin/events' : '/admin/events/new' }) %>
+<main class="stack">
+<section class="container">
+<h1 style="margin:0 0 10px 0;">
+<%= mode === 'edit' ? 'Edit event' : 'Create event' %>
+</h1>
+<%- include('../includes/flash') %>
+
+
+<form method="POST" action="<%= mode === 'edit' ? ('/admin/events/' + event.id ) : '/admin/events/new/' %>">
+<% if (mode === 'edit') { %>
+<input type="hidden" name="id" value="<%= event.id %>" />
+<% } %>
+
+
+<div class="grid cols-2">
+<div class="field">
+<label for="title">Title</label>
+<input id="title" name="title" type="text" required value="<%= event && event.title || '' %>" />
+</div>
+<div class="field">
+<label for="venue">Venue</label>
+<input id="venue" name="venue" type="text" required value="<%= event && event.venue || '' %>" />
+</div>
+<div class="field">
+<label for="date">Date and time</label>
+<input id="date" name="date" type="datetime-local" required value="<%= event && event.date || '' %>" />
+</div>
+<div class="field">
+<label for="isPublished">Published</label>
+<select id="isPublished" name="isPublished">
+<option value="false" <%= event && !event.isPublished ? 'selected' : '' %>>No</option>
+<option value="true" <%= event && event.isPublished ? 'selected' : '' %>>Yes</option>
+</select>
+</div>
+</div>
+
+
+<h3>Ticket types</h3>
+<p class="muted">Each row is a ticket type, price in naira, capacity is the number of seats available.</p>
+
+
+<table class="table" id="ttable">
+<thead>
+<tr>
+<th>Name</th>
+<th>Price</th>
+<th>Capacity</th>
+<th class="right">Actions</th>
+</tr>
+</thead>
+<tbody id="tbody">
+<% const rows = ticketTypes && ticketTypes.length ? ticketTypes : [{ name: '', price: '', capacity: '' }]; %>
+<% rows.forEach(function(tt, i) { %>
+<tr>
+<td><input name="ticketTypes[<%= i %>][name]" type="text" required value="<%= tt.name || '' %>" /></td>
+<td><input name="ticketTypes[<%= i %>][price]" type="number" step="0.01" min="0" required value="<%= tt.price || '' %>" /></td>
+<td>
+    <input name="ticketTypes[<%= i %>][capacity]" type="number" min="0" required value="<%= tt.capacity || '' %>" />
+    <input type="hidden" name="ticketTypes[<%= i %>][id]" value="<%= tt.id || '' %>" />
+</td>
+<td class="right">
+    <% if (tt.id) { %>
+        <form action="/admin/deleteTicketType" method="post" style="display:inline;">
+            <input type="hidden" name="id" value="<%= tt.id %>">
+            <button class="btn danger" type="submit">Remove</button>
+        </form>
+    <% } else { %>
+        <button class="btn danger" type="button" data-remove="<%= i %>">Remove</button>
+    <% } %>
+</td>
+</tr>
+<% }) %>
+</tbody>
+</table>
+
+
+<div class="actions" style="justify-content: space-between; margin-top: 12px;">
+<button class="btn" type="button" id="addRow">Add ticket type</button>
+<button class="btn primary" type="submit"><%= mode === 'edit' ? 'Save changes' : 'Create event' %></button>
+</div>
+</form>
+</section>
+</main>
+<script>
+    const tbody = document.getElementById('tbody');
+    const addRowBtn = document.getElementById('addRow');
+    function rowCount() { return tbody.querySelectorAll('tr').length; }
+    function makeRow(i) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+        <td><input name="ticketTypes[${i}][name]" type="text" required /></td>
+        <td><input name="ticketTypes[${i}][price]" type="number" step="0.01" min="0" required /></td>
+        <td><input name="ticketTypes[${i}][capacity]" type="number" min="0" required /></td>
+        <td class="right"><button class="btn danger" type="button" data-remove="${i}">Remove</button></td>
+        `;
+        return tr; 
+    }
+    addRowBtn.addEventListener('click', () => { tbody.appendChild(makeRow(rowCount())); });
+    tbody.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-remove]');
+        if (!btn.value) return;
+        const tr = btn.closest('tr');
+        tr.remove();
+        // No renumbering, server can ignore missing indexes
+    });
+</script>
+<%- include('../includes/footer') %>

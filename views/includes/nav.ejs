@@ -1,0 +1,10 @@
+<header>
+    <nav>
+        <a href="/" class="brand">Ticketing</a>
+        <div class="links" style="display:flex; gap:8px;">
+            <a href="/events" class="<%= activePath === '/events' ? 'active' : '' %>">Events</a>
+            <a href="/admin/events" class="<%= activePath === '/admin/events' ? 'active' : '' %>">Admin, Events</a>
+            <a href="/admin/events/new" class="<%= activePath === '/admin/events/new' ? 'active' : '' %>">New Event</a>
+        </div>
+    </nav>
+</header>

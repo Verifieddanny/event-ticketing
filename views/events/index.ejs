@@ -1,0 +1,51 @@
+<%- include('../includes/head', { title: 'Events'}) %>
+<%- include('../includes/nav', { activePath: '/*' }) %>
+<main class="stack">
+    <div class="container">
+        <form method="GET" action="/events" class="row" style="justify-content: space-between;">
+            <div class="row" style="flex:1; gap:8px;">
+                <!-- <input type="search" name="search" placeholder="Search events" value="<%= q || '' %>" /> -->
+                <input type="search" name="search" placeholder="Search events" />
+
+                <button class="btn">Search</button>
+            </div>
+            <div class="muted">Page <%= page %> of <%= Math.max(1, Math.ceil(total / perPage)) %></div>
+        </form>
+    </div>
+
+    <% if (!events || events.length === 0) { %>
+        <div class="empty">No events found</div>
+    <% } else { %>
+        <section class="grid cols-2">
+        <% events.forEach(function(ev) { %>
+            <article class="container">
+            <h2 style="margin:0 0 6px 0;">
+            <a href="/events/<%= ev.id %>"><%= ev.title %></a>
+            </h2>
+            <p class="muted" style="margin:0 0 10px 0;">
+            <%= ev.venue %> ( <%= ev.dateFormatted || ev.date %> )
+            </p>
+            <div class="actions">
+            <% if (ev.isPublished) { %>
+                <span class="badge">Published</span>
+            <% } else { %>
+                <span class="badge">Draft</span>
+            <% } %>
+            <a class="btn" href="/events/<%= ev.id %>">View</a>
+            </div>
+            </article>
+        <% }) %>
+        </section>
+
+
+        <div class="pagination">
+        <% const totalPages = Math.max(1, Math.ceil(total / perPage)); %>
+        <% const prev = Math.max(1, page - 1); %>
+        <% const next = Math.min(totalPages, page + 1); %>
+        <a class="pill" href="/events?page=<%= prev %>&q=<%= q || '' %>">Prev</a>
+        <span class="muted">Page <%= page %> of <%= totalPages %></span>
+        <a class="pill" href="/events?page=<%= next %>&q=<%= q || '' %>">Next</a>
+        </div>
+    <% } %>
+</main>
+<%- include('../includes/footer') %>

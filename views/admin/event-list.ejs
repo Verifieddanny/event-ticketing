@@ -1,0 +1,42 @@
+<%- include('../includes/head', { title: 'Admin, Events' }) %>
+<%- include('../includes/nav', { activePath: '/admin/events' }) %>
+<main class="stack">
+    <section class="container">
+        <div class="actions" style="justify-content: space-between;">
+            <h1 style="margin:0;">Events</h1>
+            <a class="btn" href="/admin/events/new">New event</a>
+        </div>
+        <% if (!events || events.length === 0) { %>
+        <div class="empty" style="margin-top:12px;">No events yet</div>
+        <% } else { %>
+        <table class="table" style="margin-top:12px;">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Venue</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th class="right">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            <% events.forEach(function(ev) { %>
+            <tr>
+                <td><a href="/events/<%= ev.id %>"><%= ev.title %></a></td>
+                <td><%= ev.venue %></td>
+                <td><%= ev.dateFormatted || ev.date %></td>
+                <td><%= ev.isPublished ? 'Published' : 'Draft' %></td>
+                <td class="right">
+                    <a class="btn" href="/admin/events/<%= ev.id %>/edit">Edit</a>
+                    <form method="POST" action="/admin/events/<%= ev.id %>/delete" style="display:inline-block; margin-left:6px;">
+                        <button class="btn danger" type="submit">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            <% }) %>
+            </tbody>
+        </table>
+        <% } %>
+    </section>
+</main>
+<%- include('../includes/footer') %>

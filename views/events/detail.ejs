@@ -1,0 +1,88 @@
+<%- include('../includes/head', { title: event.title }) %>
+<%- include('../includes/nav', { activePath: '/events' }) %>
+<main class="stack">
+    <section class="container">
+        <h1 style="margin:0 0 6px 0;"><%= event.title %></h1>
+        <p class="muted" style="margin:0;">
+        <strong><%= event.venue %></strong>, <%= event.dateFormatted || event.date %>
+        </p>
+        <% if (!event.isPublished) { %>
+        <p class="error">This event is not published, for testing only.</p>
+        <% } %>
+    </section>
+
+    <section class="container">
+        <h3 style="margin-top:0;">Select tickets</h3>
+        <% if (!ticketTypes || ticketTypes.length === 0) { %>
+        <div class="empty">No ticket types for this event yet</div>
+        <% } else { %>
+        <form id="booking-form" method="POST" action="/bookings">
+            <input type="hidden" name="eventId" value="<%= event.id %>" />
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th class="right">Price</th>
+                        <th class="right">Available</th>
+                        <th class="right">Qty</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <% ticketTypes.forEach(function(tt, i) { %>
+                    <tr>
+                        <td><%= tt.name %></td>
+                        <td class="right">₦<%= tt.price %></td>
+                        <td class="right"><%= tt.capacity %></td>
+                        <td class="right">
+                            <div class="row" style="justify-content:flex-end;">
+                                <input type="hidden" name="items[<%= i %>][ticketTypeId]" value="<%= tt.id %>" />
+                                <button type="button" class="btn" data-dec="<%= i %>">−</button>
+                                <input aria-label="Quantity" min="0" max="999" type="number" name="items[<%= i %>][qty]" value="0" style="width:80px; text-align:right;" />
+                                <button type="button" class="btn" data-inc="<%= i %>">+</button>
+                            </div>
+                        </td>
+                    </tr>
+                <% }) %>
+                </tbody>
+            </table>
+
+
+            <div class="grid cols-2" style="margin-top:16px;">
+                <div class="container" style="background:#0b121f;">
+                    <h3 style="margin-top:0;">Your details</h3>
+                    <div class="field">
+                        <label for="buyerName">Full name</label>
+                        <input id="buyerName" name="buyerName" type="text" required value="<%= prefill && prefill.buyerName || '' %>" />
+                    </div>
+                    <div class="field">
+                        <label for="buyerEmail">Email</label>
+                        <input id="buyerEmail" name="buyerEmail" type="email" required value="<%= prefill && prefill.buyerEmail || '' %>" />
+                    </div>
+                </div>
+                <div class="container" style="display:flex; align-items:end; justify-content:flex-end;">
+                    <button class="btn primary" type="submit">Create booking</button>
+                </div>
+            </div>
+        </form>
+        <% } %>
+    </section>
+</main>
+
+<script>
+    // small quantity helpers
+    document.querySelectorAll('[data-inc]').forEach(btn => {
+    btn.addEventListener('click', () => {
+    const i = btn.getAttribute('data-inc');
+    const input = document.querySelector(`input[name="items[${i}][qty]"]`);
+    input.value = Math.max(0, parseInt(input.value || '0', 10) + 1);
+    });
+    });
+    document.querySelectorAll('[data-dec]').forEach(btn => {
+    btn.addEventListener('click', () => {
+    const i = btn.getAttribute('data-dec');
+    const input = document.querySelector(`input[name="items[${i}][qty]"]`);
+    input.value = Math.max(0, parseInt(input.value || '0', 10) - 1);
+    });
+    });
+</script>
+<%- include('../includes/footer') %>
