@@ -1,3 +1,4 @@
+require('dotenv').config()
 // Native Modules
 const path = require('path');
 
