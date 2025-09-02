@@ -1,6 +1,12 @@
-require('dotenv').config()
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config();
+}
+const PORT = parseInt(process.env.PORT || '3000', 10);
+
 // Native Modules
 const path = require('path');
+
+
 
 // Third Party Modules
 const express = require('express');
@@ -40,11 +46,13 @@ Booking.belongsToMany(TicketType, { through: BookingItem});
 TicketType.belongsToMany(Booking, { through: BookingItem })
 
 
+
 sequelize
     // .sync({ force: true })
     .sync()
     .then(result => {
-        app.listen(3000);
+        app.get('/health', (req, res) => res.status(200).send('ok'));
+        app.listen(PORT, '0.0.0.0', () => { console.log("Listening on ", PORT)});
     })
     .catch(err => {
         console.log(err);
