@@ -34,6 +34,7 @@ const BookingItem = require("./models/BookingItem");
 app.use(express.static(path.join(rootDir, "public")));
 app.use(express.urlencoded({ extended: false }));
 
+app.get("/health", (req, res) => res.status(200).send("ok"));
 app.use("/admin", adminRoutes);
 app.use(eventRoutes);
 app.use(pageNOtFoundRoutes);
@@ -46,25 +47,12 @@ sequelize
   // .sync({ force: true })
   .sync()
   .then((result) => {
-    console.log({
-      DB_HOST: process.env.DB_HOST || process.env.MYSQLHOST,
-      DB_NAME: process.env.DB_NAME || process.env.MYSQLDATABASE,
-      DB_USER: process.env.DB_USER || process.env.MYSQLUSER,
-      DB_PORT: process.env.DB_PORT || process.env.MYSQLPORT,
-    });
 
-    app.get("/health", (req, res) => res.status(200).send("ok"));
     app.listen(PORT, "0.0.0.0", () => {
       console.log("Listening on ", PORT);
     });
   })
   .catch((err) => {
-    console.log({
-      DB_HOST: process.env.DB_HOST || process.env.MYSQLHOST,
-      DB_NAME: process.env.DB_NAME || process.env.MYSQLDATABASE,
-      DB_USER: process.env.DB_USER || process.env.MYSQLUSER,
-      DB_PORT: process.env.DB_PORT || process.env.MYSQLPORT,
-    });
-
+    
     console.log(err);
   });
